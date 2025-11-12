@@ -84,12 +84,9 @@ void moveArmForColor(int detectedColor)
 }
 
 int totalCount(int currentCount) {
-    /*
-    This function as provided has a loop that opens and closes the claw.
-    Per the instructions, we will call it without modification to simply
-    get the incremented count. The actual claw actions for pickup/drop
-    are handled in the main loop logic.
-    */
+
+    openClaw();  
+    closeClaw();
     return currentCount + 1;
 }
 
@@ -166,7 +163,7 @@ void driveAndTurn(int motorPower, int &detectedColor)
 
            MotorLeft.spin(forward);
            MotorRight.spin(forward);
-           while((MotorLeft.position(turns) * 200) < )
+           while((MotorLeft.position(turns) * 200) < ) // move to next row
            {}
            MotorLeft.stop();
            MotorRight.stop();
