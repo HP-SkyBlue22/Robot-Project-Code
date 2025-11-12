@@ -62,6 +62,45 @@ void openClaw()
   clawMotor.stop(); 
 }
 
+int whichColour()
+{
+  Optical7.setLightPower(100);
+  Optical7.setLight(ledState::on);
+
+  double hueValue = Optical7.hue();         // 0–359 degrees
+  double brightness = Optical7.brightness(); // 0–100%
+    
+  int detectedColour = 0; // 0 = none, 1 = black, 2 = white
+  Brain.Screen.clearScreen();
+
+  // Brown: medium brightness (15–50%) and warm hue (30–36°)
+  // Off-White: higher brightness (> 55%)
+
+    if ((hueValue > 30 && hueValue < 36) && (brightness >= 15 && brightness <= 50)) 
+    {
+      detectedColour = 1;
+      Brain.Screen.print("Black");
+    }
+    else if (brightness > 55) 
+    {
+      detectedColour = 2;
+      Brain.Screen.print("White");
+    }
+    else 
+    {
+      detectedColour = 0;
+      Brain.Screen.print("no");
+    }
+
+    // --- Debug info ---
+    Brain.Screen.newLine();
+    Brain.Screen.print("Hue: %.1f", hueValue);
+
+    wait(200, msec);
+
+    return detectedColour;
+}
+
 void moveArmForColor(int detectedColor)
 {
   // detectedColor: 1 = Black, 2 = White
