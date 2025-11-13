@@ -135,12 +135,10 @@ void driveAlongRow () // drive and pick up
   int detectedColor = -1;
   int pieceCount = 0;
 
-  if (Distance12.objectDistance(mm) <= 1300) 
+  if (Distance12.objectDistance(mm) <= 130) 
   {
-    MotorLeft.stop();
-    MotorRight.stop();
-                
-    // --- Pickup and Sort Sequence ---
+    MotorLeft.stop(brake);
+    MotorRight.stop(brake);
     openClaw(); // Open claw 
                 
                 
@@ -148,12 +146,14 @@ void driveAlongRow () // drive and pick up
 
                 
     // Check color here
+    detectedColor = whichColour();
 
                 
     // Call function to sort the piece.
     moveArmForColor(detectedColor);
 
     pieceCount = totalCount(pieceCount);
+    // currently drops piece into box then adds 1 to count of pieces
                 
     // Resume driving
     MotorLeft.spin(forward);
