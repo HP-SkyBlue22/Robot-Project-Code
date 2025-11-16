@@ -122,6 +122,18 @@ void vexcodeInit() {
 // Allows for easier use of the VEX Library
 using namespace vex;
 
+void configureAllSensors(){
+  BrainInertial.calibrate();
+  wait(2,seconds);
+  BrainInertial.setHeading(0,degrees);
+  BrainInertial.setRotation(0,degrees);
+  MotorLeft.setPosition(0,turns);
+  MotorRight.setPosition(0,turns);
+  Brain.Screen.clearScreen();
+  Brain.Screen.setFont(mono15);
+  Optical3.setLight(ledState::on);
+}
+
 void waitTouch() 
 {
   while(!TouchLED9.pressing())
