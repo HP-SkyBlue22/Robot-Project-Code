@@ -229,7 +229,7 @@ int whichColor()
   return detectedColor;
 }
 
-void moveArmForColor(int colorDetected) 
+void moveArmForColor(int colorDetected) //fixed
 {
   // colorID: 1 = Black, 2 = White
     // React ONCE
