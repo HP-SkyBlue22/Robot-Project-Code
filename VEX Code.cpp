@@ -160,9 +160,6 @@ void closeClaw()
 {
   clawMotor.setPosition(0,degrees);
   clawMotor.spin(reverse, 50, percent);
-  while (clawMotor.position(degrees)>-10)
-  {}
-  clawMotor.stop();
   return;
 }
 
@@ -238,7 +235,7 @@ void moveArmForColor(int colorDetected)
       closeClaw();
       wait(1, seconds);
       armMotor.spin(forward,30,percent);
-      armMotor.spinToPosition(180, degrees);
+      armMotor.spinToPosition(175, degrees);
       wait(1,seconds);
       openClaw();
       wait(1, seconds);
@@ -250,7 +247,6 @@ void moveArmForColor(int colorDetected)
       // Prevent re-triggering until ready again
       wait(2, seconds);
 }
-
 
 int totalCount(int currentCount) 
 {
