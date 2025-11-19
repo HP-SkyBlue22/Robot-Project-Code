@@ -146,7 +146,7 @@ void waitTouch()
 bool touchedIn30S()
 {
   Brain.Timer.reset();
-  while(Brain.Timer.value()<30)
+  while(Brain.Timer.value()<10)
   {
     if(TouchLED9.pressing())
     {
@@ -160,6 +160,7 @@ void closeClaw()
 {
   clawMotor.setPosition(0,degrees);
   clawMotor.spin(reverse, 50, percent);
+  
   return;
 }
 
@@ -176,8 +177,8 @@ void openClaw()
 //make a function to detect colour and return -1 1 or 2
 int whichColor()
 {
-  double hueValue = Optical3.hue();         // 0–359 degrees
-  double brightness = Optical3.brightness(); // 0–100%
+  double hueValue = Optical8.hue();         // 0–359 degrees
+  double brightness = Optical8.brightness(); // 0–100%
     
   int detectedColor = -1; // -1 = none, 1 = black, 2 = white
   Brain.Screen.clearScreen();
@@ -210,7 +211,7 @@ int whichColor()
   return detectedColor;
 }
 
-void moveArmForColor(int colorDetected) 
+void moveArmForColor(int colorDetected, int& pieceCount) 
 {
   // colorID: 1 = Black, 2 = White
     // React ONCE
@@ -221,8 +222,25 @@ void moveArmForColor(int colorDetected)
       closeClaw();
       wait(1, seconds);  
       armMotor.spin(forward,30,percent);
-      armMotor.spinToPosition(143, degrees);
-      wait(1,seconds); //for arm to settle
+      armMotor.spinToPosition(148, degrees);
+      wait(2,seconds); //for arm to settle
+
+      //check colour one more time to ensure dropped here , then add
+
+double hueValue = Optical8.hue();         // 0–359 degrees
+  double brightness = Optical8.brightness(); // 0–100%
+
+     if ((hueValue > 30 && hueValue < 38.3) && (brightness >= 8.6 && brightness <= 50))
+  {
+    pieceCount = pieceCount+1;
+    Brain.Screen.print("dropped");
+  }
+  else if (hueValue > 39 && brightness > 55.5) 
+  {
+    pieceCount = pieceCount+1;
+        Brain.Screen.print("dropped");
+
+  }
       openClaw();
       wait(1, seconds);
       armMotor.spin(reverse,10,percent);
@@ -230,13 +248,32 @@ void moveArmForColor(int colorDetected)
       {}
       armMotor.stop(brake);
     }
-    else if (colorDetected == 2)
+
+
+
+    else if (colorDetected == 2) // if white
     {
       closeClaw();
       wait(1, seconds);
       armMotor.spin(forward,30,percent);
       armMotor.spinToPosition(175, degrees);
-      wait(1,seconds);
+      wait(2,seconds);
+      //check colour one more time to ensure dropped here , then add
+
+double hueValue = Optical8.hue();         // 0–359 degrees
+  double brightness = Optical8.brightness(); // 0–100%
+
+    if ((hueValue > 30 && hueValue < 38.3) && (brightness >= 8.6 && brightness <= 50)) 
+  {
+    pieceCount = pieceCount+1;
+    Brain.Screen.print("dropped");
+  }
+  else if (hueValue > 39 && brightness > 55.5) 
+  {
+    pieceCount = pieceCount+1;
+        Brain.Screen.print("dropped");
+
+  }
       openClaw();
       wait(1, seconds);
       armMotor.spin(reverse,10,percent);
@@ -244,9 +281,13 @@ void moveArmForColor(int colorDetected)
       {}
       armMotor.stop(brake);
     }
+    
+        
+
       // Prevent re-triggering until ready again
       wait(2, seconds);
 }
+
 
 int totalCount(int currentCount) 
 {
@@ -259,11 +300,11 @@ void driveAlongRow (int &pieceCount, double distBenchmark) // drive and pick up
   int detectedColor = -1;
   // Brain.Screen.newLine();
   //   Brain.Screen.print("drive along row");
-wait(1, seconds);
     Brain.Screen.newLine();
-    
-  Brain.Screen.print("%.f", distBenchmark);
-  if (Distance12.objectDistance(mm) < (distBenchmark - 2.2)) // returns 0 if no object detected
+        Brain.Screen.newLine();
+
+  // Brain.Screen.print("%.f", distBenchmark);
+  if (Distance12.objectDistance(mm) < (12) || whichColor()!= -1) 
    {
     Brain.Screen.newLine();
     Brain.Screen.print("distance detected");
@@ -280,9 +321,9 @@ wait(1, seconds);
 
                 
     // Call function to sort the piece.
-    moveArmForColor(detectedColor);
+    moveArmForColor(detectedColor, pieceCount);
 
-    pieceCount = totalCount(pieceCount);
+
     // no longer drops piece into box, only adds 1 to count of pieces
                 
     // Resume driving
@@ -296,21 +337,27 @@ void driveAndTurn(int motorPower, int &detectedColor, int &pieceCount)
 {
     MotorLeft.setVelocity(motorPower,percent);
     MotorRight.setVelocity(motorPower,percent);
-     for (int row = 0; row < 2; row++)  // changed to 2 for testing, change back to 8
+     for (int row = 0; row < 10; row++)  // changed to 2 for testing, change back to 8
      {
   Brain.Screen.print("im moving!");
         MotorLeft.spin(forward);
         MotorRight.spin(forward);
-          double distBenchmark = Distance12.objectDistance(mm);
+          double distBenchmark = Distance12.objectDistance(mm); // benchmark at beginning of row
         
   //       // Reset the encoder at the start of each row to measure distance
         MotorLeft.setPosition(0, turns);
 
-        while (MotorLeft.position(turns)*200 < 400) // 16 inches to cm? 
+        while (MotorLeft.position(turns)*200 < 500) // ~25 inches to cm
         {
             driveAlongRow(pieceCount, distBenchmark);
         }
-        if (row < 7) {
+        Brain.Screen.newLine();
+            Brain.Screen.print("Finished row");
+
+        if (row < 10) {
+
+
+          
            BrainInertial.setRotation(0,degrees);
            if (row % 2 == 0) { 
                BrainInertial.setRotation(0, degrees);
@@ -323,7 +370,11 @@ void driveAndTurn(int motorPower, int &detectedColor, int &pieceCount)
                MotorRight.spin(forward);
               
            }
-           while (abs(BrainInertial.rotation(degrees)) < abs(90))
+           
+           
+           
+           
+           while (abs(BrainInertial.rotation(degrees)) < abs(71))
            {}
            MotorLeft.stop();
            MotorRight.stop();
@@ -332,10 +383,14 @@ void driveAndTurn(int motorPower, int &detectedColor, int &pieceCount)
 
            MotorLeft.spin(forward);
            MotorRight.spin(forward);
-           while((MotorLeft.position(turns) * 200) < 100) // move to next row, filler number
+           while((MotorLeft.position(turns) * 200) < 50) // move to next row, filler number
            {}
            MotorLeft.stop();
            MotorRight.stop();
+
+           
+
+
 
           if (row % 2 == 0) { 
                BrainInertial.setRotation(0, degrees);
@@ -348,76 +403,17 @@ void driveAndTurn(int motorPower, int &detectedColor, int &pieceCount)
                MotorRight.spin(forward);
               
            }
-           while (abs(BrainInertial.rotation(degrees)) < abs(90))
-           {}
-           MotorLeft.stop();
-           MotorRight.stop(); // this can be a function lowkey
+           while (abs(BrainInertial.rotation(degrees)) < abs(69)) // 67 < x < 69
+           {} // this can be a function lowkey
+
+
+
         
    MotorLeft.stop(brake);
    MotorRight.stop(brake); // girl....... (i forgor)
   //   }
 }
      }}
-
-/*
-void driveAndTurn(int motorPower, int &detectedColor) 
-{
-    MotorLeft.setVelocity(motorPower,percent);
-    MotorRight.setVelocity(motorPower,percent);
-    for (int row = 0; row < 8; row++) {
-        MotorLeft.spin(forward);
-        MotorRight.spin(forward);
-
-        // Reset the encoder at the start of each row to measure distance
-        MotorLeft.setPosition(0, turns);
-
-        while ((MotorLeft.position*200) < 406) // 16 inches to cm? 
-        {
-            driveAlongRow();
-        }
-
-        if (row < 7) {
-           BrainInertial.setRotation(0,degrees);
-           if (row % 2 == 0) { 
-               BrainInertial.setRotation(0, degrees);
-                 MotorLeft.spin(forward);
-                 MotorRight.spin(reverse);
-                
-           } else { 
-               BrainInertial.setRotation(0, degrees);
-               MotorLeft.spin(reverse);
-               MotorRight.spin(forward);
-              
-           }
-           while (abs(BrainInertial.rotation(degrees)) < abs(90))
-           {}
-           MotorLeft.stop();
-           MotorRight.stop();
-          
-           MotorLeft.setPosition(0, turns);
-
-           MotorLeft.spin(forward);
-           MotorRight.spin(forward);
-           while((MotorLeft.position(turns) * 200) < 100) // move to next row, filler number
-           {}
-           MotorLeft.stop();
-           MotorRight.stop();
-
-          if (row % 2 == 0) { // Right turn again
-               BrainInertial.setRotation(0, degrees);
-               MotorLeft.spin(forward); MotorRight.spin(reverse);
-               while(BrainInertial.rotation() < 90) {}
-           } else { // Left turn again
-               BrainInertial.setRotation(0, degrees);
-               MotorLeft.spin(reverse); MotorRight.spin(forward);
-               while(BrainInertial.rotation() > -90) {}
-           }
-           MotorLeft.stop(); MotorRight.stop();
-       }
-   }
-} // or *-1 to turn
-
-*/
 
 int main() {
 
@@ -426,6 +422,7 @@ int main() {
 
   int detectedColor = -1;
   int pieceCount = 0;
+  //configureAllSensors();
     Optical8.setLightPower(100);
   Optical8.setLight(ledState::on);
   armMotor.setMaxTorque(100, percent);
@@ -472,13 +469,15 @@ int main() {
 // {
 // driveAlongRow(pieceCount);
 // }
-  driveAndTurn(10, detectedColor, pieceCount);
+  driveAndTurn(30, detectedColor, pieceCount);
 
     
-    Brain.Screen.newLine();
-    Brain.Screen.print("Press Touch LED to exit.");
+    // Brain.Screen.newLine();
+    // Brain.Screen.print("Press Touch LED to exit.");
     Brain.Screen.newLine();
     Brain.Screen.print("Collected: %d", pieceCount);
+    MotorRight.stop(brake);
+    MotorLeft.stop(brake);
     waitTouch();
 
 
