@@ -176,9 +176,6 @@ void closeClaw()
 {
   clawMotor.setPosition(0,degrees);
   clawMotor.spin(reverse, 50, percent);
-  while (clawMotor.position(degrees)>-10)
-  {}
-  clawMotor.stop();
   return;
 }
 
@@ -205,12 +202,12 @@ int whichColor()
   // Brown: medium brightness (15–50%) and warm hue (20–45°)
   // Beige/light off-white: higher brightness (> 55%)
 
-  if ((hueValue > 30 && hueValue < 36) && (brightness >= 15 && brightness <= 50)) 
+  if ((hueValue > 30 && hueValue < 38.3) && (brightness >= 8.6 && brightness <= 50)) 
   {
     detectedColor = 1;
     Brain.Screen.print("Black");
   }
-  else if (hueValue > 39 && brightness > 55) 
+  else if (hueValue > 39 && brightness > 55.5) 
   {
     detectedColor = 2;
     Brain.Screen.print("White");
@@ -229,7 +226,7 @@ int whichColor()
   return detectedColor;
 }
 
-void moveArmForColor(int colorDetected) //fixed
+void moveArmForColor(int colorDetected) 
 {
   // colorID: 1 = Black, 2 = White
     // React ONCE
@@ -240,7 +237,7 @@ void moveArmForColor(int colorDetected) //fixed
       closeClaw();
       wait(1, seconds);  
       armMotor.spin(forward,30,percent);
-      armMotor.spinToPosition(150, degrees);
+      armMotor.spinToPosition(143, degrees);
       wait(1,seconds); //for arm to settle
       openClaw();
       wait(1, seconds);
@@ -254,7 +251,7 @@ void moveArmForColor(int colorDetected) //fixed
       closeClaw();
       wait(1, seconds);
       armMotor.spin(forward,30,percent);
-      armMotor.spinToPosition(180, degrees);
+      armMotor.spinToPosition(175, degrees);
       wait(1,seconds);
       openClaw();
       wait(1, seconds);
