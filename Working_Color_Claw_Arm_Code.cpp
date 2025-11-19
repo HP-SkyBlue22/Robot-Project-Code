@@ -202,12 +202,12 @@ int whichColor()
   // Brown: medium brightness (15–50%) and warm hue (20–45°)
   // Beige/light off-white: higher brightness (> 55%)
 
-  if ((hueValue > 30 && hueValue <= 39.5) && (brightness >= 8.6 && brightness <= 50)) 
+  if ((hueValue > 30 && hueValue <= 38) && (brightness >= 10 && brightness <= 50)) 
   {
     detectedColor = 1;
     Brain.Screen.print("Black");
   }
-  else if (hueValue >= 39.5 && brightness > 55.5) 
+  else if ((hueValue > 38 && hueValue <= 40) && brightness > 55.5) 
   {
     detectedColor = 2;
     Brain.Screen.print("White");
