@@ -202,12 +202,12 @@ int whichColor()
   // Brown: medium brightness (15–50%) and warm hue (20–45°)
   // Beige/light off-white: higher brightness (> 55%)
 
-  if ((hueValue > 30 && hueValue < 38.3) && (brightness >= 8.6 && brightness <= 50)) 
+  if ((hueValue > 30 && hueValue <= 39.5) && (brightness >= 8.6 && brightness <= 50)) 
   {
     detectedColor = 1;
     Brain.Screen.print("Black");
   }
-  else if (hueValue > 39 && brightness > 55.5) 
+  else if (hueValue >= 39.5 && brightness > 55.5) 
   {
     detectedColor = 2;
     Brain.Screen.print("White");
@@ -236,12 +236,12 @@ void moveArmForColor(int colorDetected)
     {
       closeClaw();
       wait(1, seconds);  
-      armMotor.spin(forward,30,percent);
+      armMotor.spin(forward,20,percent);
       armMotor.spinToPosition(143, degrees);
       wait(1,seconds); //for arm to settle
       openClaw();
       wait(1, seconds);
-      armMotor.spin(reverse,10,percent);
+      armMotor.spin(reverse,16,percent);
       while(armMotor.position(degrees) > 0)
       {}
       armMotor.stop(brake);
@@ -250,12 +250,12 @@ void moveArmForColor(int colorDetected)
     {
       closeClaw();
       wait(1, seconds);
-      armMotor.spin(forward,30,percent);
+      armMotor.spin(forward,25,percent);
       armMotor.spinToPosition(175, degrees);
       wait(1,seconds);
       openClaw();
       wait(1, seconds);
-      armMotor.spin(reverse,10,percent);
+      armMotor.spin(reverse,16,percent);
       while(armMotor.position(degrees) > 0)
       {}
       armMotor.stop(brake);
